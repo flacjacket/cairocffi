@@ -19,24 +19,14 @@ from . import dlopen, ImageSurface, Context, constants
 from .compat import xrange
 
 try:
-    from ._ffi_pixbuf import ffi
+    from ._ffi_pixbuf import ffi, lib
 except ImportError:
     # PyPy < 2.6 compatibility
     from .ffi_build import ffi_pixbuf as ffi
 
 __all__ = ['decode_to_image_surface']
 
-gdk_pixbuf = dlopen(ffi, 'gdk_pixbuf-2.0', 'libgdk_pixbuf-2.0-0',
-                    'libgdk_pixbuf-2.0.so')
-gobject = dlopen(ffi, 'gobject-2.0', 'libgobject-2.0-0', 'libgobject-2.0.so')
-glib = dlopen(ffi, 'glib-2.0', 'libglib-2.0-0', 'libglib-2.0.so')
-try:
-    gdk = dlopen(ffi, 'gdk-3', 'gdk-x11-2.0', 'libgdk-win32-2.0-0',
-                 'libgdk-x11-2.0.so')
-except OSError:
-    gdk = None
-
-gobject.g_type_init()
+lib.g_type_init()
 
 
 class ImageLoadingError(ValueError):
@@ -60,18 +50,18 @@ def handle_g_error(error, return_value):
                        ffi.string(error.message).decode('utf8', 'replace'))
         else:
             message = 'Pixbuf error'
-        glib.g_error_free(error)
+        lib.g_error_free(error)
         raise ImageLoadingError(message)
 
 
 class Pixbuf(object):
     """Wrap a :c:type:`GdkPixbuf` pointer and simulate methods."""
     def __init__(self, pointer):
-        gobject.g_object_ref(pointer)
-        self._pointer = ffi.gc(pointer, gobject.g_object_unref)
+        lib.g_object_ref(pointer)
+        self._pointer = ffi.gc(pointer, lib.g_object_unref)
 
     def __getattr__(self, name):
-        function = getattr(gdk_pixbuf, 'gdk_pixbuf_' + name)
+        function = getattr(lib, 'gdk_pixbuf_' + name)
         return partial(function, self._pointer)
 
 
@@ -89,19 +79,19 @@ def decode_to_pixbuf(image_data):
 
     """
     loader = ffi.gc(
-        gdk_pixbuf.gdk_pixbuf_loader_new(), gobject.g_object_unref)
+        lib.gdk_pixbuf_loader_new(), lib.g_object_unref)
     error = ffi.new('GError **')
-    handle_g_error(error, gdk_pixbuf.gdk_pixbuf_loader_write(
+    handle_g_error(error, lib.gdk_pixbuf_loader_write(
         loader, ffi.new('guchar[]', image_data), len(image_data), error))
-    handle_g_error(error, gdk_pixbuf.gdk_pixbuf_loader_close(loader, error))
+    handle_g_error(error, lib.gdk_pixbuf_loader_close(loader, error))
 
-    format_ = gdk_pixbuf.gdk_pixbuf_loader_get_format(loader)
+    format_ = lib.gdk_pixbuf_loader_get_format(loader)
     format_name = (
-        ffi.string(gdk_pixbuf.gdk_pixbuf_format_get_name(format_))
+        ffi.string(lib.gdk_pixbuf_format_get_name(format_))
         .decode('ascii')
         if format_ != ffi.NULL else None)
 
-    pixbuf = gdk_pixbuf.gdk_pixbuf_loader_get_pixbuf(loader)
+    pixbuf = lib.gdk_pixbuf_loader_get_pixbuf(loader)
     if pixbuf == ffi.NULL:
         raise ImageLoadingError('Not enough image data (got a NULL pixbuf.)')
     return Pixbuf(pixbuf), format_name
@@ -122,9 +112,8 @@ def decode_to_image_surface(image_data):
     """
     pixbuf, format_name = decode_to_pixbuf(image_data)
     surface = (
-        pixbuf_to_cairo_gdk(pixbuf) if gdk is not None
-        else pixbuf_to_cairo_slices(pixbuf) if not pixbuf.get_has_alpha()
-        else pixbuf_to_cairo_png(pixbuf))
+        pixbuf_to_cairo_gdk(pixbuf)
+    )
     return surface, format_name
 
 
@@ -135,7 +124,7 @@ def pixbuf_to_cairo_gdk(pixbuf):
 
     """
     dummy_context = Context(ImageSurface(constants.FORMAT_ARGB32, 1, 1))
-    gdk.gdk_cairo_set_source_pixbuf(
+    lib.gdk_cairo_set_source_pixbuf(
         dummy_context._pointer, pixbuf._pointer, 0, 0)
     return dummy_context.get_source().get_surface()
 
@@ -147,7 +136,7 @@ def pixbuf_to_cairo_slices(pixbuf):
     (cairo uses pre-multiplied alpha, but not Pixbuf.)
 
     """
-    assert pixbuf.get_colorspace() == gdk_pixbuf.GDK_COLORSPACE_RGB
+    assert pixbuf.get_colorspace() == lib.GDK_COLORSPACE_RGB
     assert pixbuf.get_n_channels() == 3
     assert pixbuf.get_bits_per_sample() == 8
     width = pixbuf.get_width()

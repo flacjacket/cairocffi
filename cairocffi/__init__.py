@@ -16,10 +16,11 @@ from . import constants
 from .compat import FileNotFoundError
 
 try:
-    from ._ffi import ffi
+    from ._ffi import ffi, lib as cairo
 except ImportError:
     # PyPy < 2.6 compatibility
-    from .ffi_build import ffi
+    from .ffi_build import ffi, SOURCES
+    cairo = ffi.verify(SOURCES, libs=['cairo'])
 
 VERSION = '0.7'
 # pycairo compat:
@@ -36,11 +37,6 @@ def dlopen(ffi, *names):
             pass
     # Re-raise the exception.
     return ffi.dlopen(names[0])  # pragma: no cover
-
-
-CAIRO_NAMES = ['libcairo.so.2', 'libcairo.2.dylib', 'libcairo-2.dll',
-               'cairo', 'libcairo-2']
-cairo = dlopen(ffi, *CAIRO_NAMES)
 
 
 class CairoError(Exception):

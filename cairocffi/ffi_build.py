@@ -11,6 +11,7 @@
 """
 
 import os
+import subprocess
 import sys
 from cffi import FFI
 
@@ -22,11 +23,26 @@ sys.path.append(this_dir)
 import constants
 
 
+def pkg_config(package, options):
+    exe = os.environ.get('PKG_CONFIG', 'pkg-config')
+    args = [exe] + options.split() + [package]
+    out = subprocess.check_output(args)
+
+    return out.strip().decode()
+
+
+# TODO: include '-xcb'
+SOURCES = '\n'.join(
+    '#include <cairo%s.h>' % ext for ext in ['', '-pdf', '-ps', '-svg']
+)
+
 # Primary cffi definitions
 ffi = FFI()
+
 if hasattr(ffi, 'set_source'):
     # PyPy < 2.6 compatibility
-    ffi.set_source('cairocffi._ffi', None)
+    ffi.set_source('cairocffi._ffi', SOURCES)
+
 ffi.cdef(constants._CAIRO_HEADERS)
 
 # include xcffib cffi definitions for cairo xcb support
@@ -37,11 +53,18 @@ try:
 except ImportError:
     pass
 
+SOURCES_PIXBUF = """
+#include <gdk-pixbuf/gdk-pixbuf.h>
+"""
+
+INCLUDES_PIXBUF = [inc_dir[2:] for inc_dir in pkg_config('gdk-pixbuf-2.0', '--cflags').split() if inc_dir[:2] == '-I']
+LIBS_PIXBUF = [lib[2:] for lib in pkg_config('gdk-pixbuf-2.0', '--libs').split() if lib[:2] == '-l']
+
 # gdk pixbuf cffi definitions
 ffi_pixbuf = FFI()
 if hasattr(ffi_pixbuf, 'set_source'):
     # PyPy < 2.6 compatibility
-    ffi_pixbuf.set_source('cairocffi._ffi_pixbuf', None)
+    ffi_pixbuf.set_source('cairocffi._ffi_pixbuf', SOURCES_PIXBUF)
 ffi_pixbuf.include(ffi)
 ffi_pixbuf.cdef('''
     typedef unsigned long   gsize;
@@ -103,5 +126,5 @@ ffi_pixbuf.cdef('''
 
 
 if __name__ == '__main__':
-    ffi.compile()
-    ffi_pixbuf.compile()
+    ffi.compile(libs=['cairo'])
+    ffi_pixbuf.compile(libs=LIBS_PIXBUF, include_dirs=INCLUDE_PIXBUF)
