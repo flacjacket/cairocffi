@@ -18,6 +18,7 @@ from .compat import FileNotFoundError
 try:
     from ._ffi import ffi, lib as cairo
 except ImportError:
+    raise
     # PyPy < 2.6 compatibility
     from .ffi_build import ffi, SOURCES
     cairo = ffi.verify(SOURCES, libs=['cairo'])
