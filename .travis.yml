@@ -9,13 +9,24 @@ python:
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
-addons:
-  apt:
-    packages:
-      - "libcairo2-dev"
-      - "libgdk-pixbuf2.0-dev"
+  - "sudo apt-get update"
+  - "sudo apt-get install ghc cabal-install xcb-proto happy alex libcairo2-dev libgdk-pixbuf2.0-dev"
+  - "cabal update"
+#addons:
+#  apt:
+#    packages:
+#      - "libcairo2-dev"
+#      - "libgdk-pixbuf2.0-dev"
 install:
-  - "pip install xcffib"
+# Make xcffib
+  - "pushd ~"
+  - "git clone -b compiled_cffi https://github.com/flacjacket/xcffib"
+  - "cd xcffib"
+  - "cabal install --only-dependencies"
+  - "cabal configure"
+  - "pip install ."
+  - "popd"
+# Install cairocffi
   - "pip install ."
 script: "py.test"
-sudo: false
+#sudo: false
