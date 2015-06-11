@@ -37,7 +37,12 @@ SOURCES_CAIRO = '\n'.join(
 )
 try:
     import xcffib
-    SOURCES_CAIRO += '\n#include <cairo-xcb.h>\n#include <xcb/xcb.h>'
+    SOURCES_CAIRO += """
+#include <cairo-xcb.h>
+#include <xcb/xcb.h>
+#include <xcb/xcbext.h>
+#include <xcb/render.h>
+"""
 except ImportError:
     pass
 
@@ -60,11 +65,8 @@ try:
 except ImportError:
     pass
 
-SOURCES_PIXBUF = """
-#include <gdk-pixbuf/gdk-pixbuf.h>
-"""
-
-INCLUDES_PIXBUF = [inc_dir[2:] for inc_dir in pkg_config('gdk-pixbuf-2.0', '--cflags').split() if inc_dir[:2] == '-I']
+SOURCES_PIXBUF = SOURCES_CAIRO + '\n#include <gdk-pixbuf/gdk-pixbuf.h>'
+INCLUDES_PIXBUF = INCLUDES_CAIRO + [inc_dir[2:] for inc_dir in pkg_config('gdk-pixbuf-2.0', '--cflags').split() if inc_dir[:2] == '-I']
 LIBS_PIXBUF = [lib[2:] for lib in pkg_config('gdk-pixbuf-2.0', '--libs').split() if lib[:2] == '-l']
 
 # gdk pixbuf cffi definitions
