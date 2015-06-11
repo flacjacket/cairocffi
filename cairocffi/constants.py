@@ -37,10 +37,10 @@ STATUS_INVALID_SIZE = 32
 STATUS_USER_FONT_NOT_IMPLEMENTED = 33
 STATUS_DEVICE_TYPE_MISMATCH = 34
 STATUS_DEVICE_ERROR = 35
-STATUS_INVALID_MESH_CONSTRUCTION = 36
-STATUS_DEVICE_FINISHED = 37
-STATUS_JBIG2_GLOBAL_MISSING = 38
-STATUS_LAST_STATUS = 39
+# STATUS_INVALID_MESH_CONSTRUCTION = 36
+# STATUS_DEVICE_FINISHED = 37
+# STATUS_JBIG2_GLOBAL_MISSING = 38
+STATUS_LAST_STATUS = 36
 
 CONTENT_COLOR = 0x1000
 CONTENT_ALPHA = 0x2000
@@ -52,7 +52,7 @@ FORMAT_RGB24 = 1
 FORMAT_A8 = 2
 FORMAT_A1 = 3
 FORMAT_RGB16_565 = 4
-FORMAT_RGB30 = 5
+# FORMAT_RGB30 = 5
 
 OPERATOR_CLEAR = 0
 OPERATOR_SOURCE = 1
@@ -88,9 +88,9 @@ ANTIALIAS_DEFAULT = 0
 ANTIALIAS_NONE = 1
 ANTIALIAS_GRAY = 2
 ANTIALIAS_SUBPIXEL = 3
-ANTIALIAS_FAST = 4
-ANTIALIAS_GOOD = 5
-ANTIALIAS_BEST = 6
+# ANTIALIAS_FAST = 4
+# ANTIALIAS_GOOD = 5
+# ANTIALIAS_BEST = 6
 
 FILL_RULE_WINDING = 0
 FILL_RULE_EVEN_ODD = 1
@@ -145,12 +145,12 @@ DEVICE_TYPE_SCRIPT = 2
 DEVICE_TYPE_XCB = 3
 DEVICE_TYPE_XLIB = 4
 DEVICE_TYPE_XML = 5
-DEVICE_TYPE_COGL = 6
-DEVICE_TYPE_WIN32 = 7
-DEVICE_TYPE_INVALID = -1
+# DEVICE_TYPE_COGL = 6
+# DEVICE_TYPE_WIN32 = 7
+# DEVICE_TYPE_INVALID = -1
 
-SURFACE_OBSERVER_NORMAL = 0
-SURFACE_OBSERVER_RECORD_OPERATIONS = 0x1
+# SURFACE_OBSERVER_NORMAL = 0
+# SURFACE_OBSERVER_RECORD_OPERATIONS = 0x1
 
 SURFACE_TYPE_IMAGE = 0
 SURFACE_TYPE_PDF = 1
@@ -182,8 +182,8 @@ PATTERN_TYPE_SOLID = 0
 PATTERN_TYPE_SURFACE = 1
 PATTERN_TYPE_LINEAR = 2
 PATTERN_TYPE_RADIAL = 3
-PATTERN_TYPE_MESH = 4
-PATTERN_TYPE_RASTER_SOURCE = 5
+# PATTERN_TYPE_MESH = 4
+# PATTERN_TYPE_RASTER_SOURCE = 5
 
 EXTEND_NONE = 0
 EXTEND_REPEAT = 1
@@ -298,7 +298,7 @@ typedef enum _cairo_format {
     CAIRO_FORMAT_A8        = 2,
     CAIRO_FORMAT_A1        = 3,
     CAIRO_FORMAT_RGB16_565 = 4,
-    CAIRO_FORMAT_RGB30     = 5
+    // CAIRO_FORMAT_RGB30     = 5
 } cairo_format_t;
 
 typedef cairo_status_t (*cairo_write_func_t) (void		  *closure,
@@ -422,9 +422,9 @@ typedef enum _cairo_antialias {
     CAIRO_ANTIALIAS_SUBPIXEL,
 
     
-    CAIRO_ANTIALIAS_FAST,
-    CAIRO_ANTIALIAS_GOOD,
-    CAIRO_ANTIALIAS_BEST
+    // CAIRO_ANTIALIAS_FAST,
+    // CAIRO_ANTIALIAS_GOOD,
+    // CAIRO_ANTIALIAS_BEST
 } cairo_antialias_t;
 
 void
@@ -1121,10 +1121,10 @@ typedef enum _cairo_device_type {
     CAIRO_DEVICE_TYPE_XCB,
     CAIRO_DEVICE_TYPE_XLIB,
     CAIRO_DEVICE_TYPE_XML,
-    CAIRO_DEVICE_TYPE_COGL,
-    CAIRO_DEVICE_TYPE_WIN32,
+    // CAIRO_DEVICE_TYPE_COGL,
+    // CAIRO_DEVICE_TYPE_WIN32,
 
-    CAIRO_DEVICE_TYPE_INVALID = -1
+    // CAIRO_DEVICE_TYPE_INVALID = -1
 } cairo_device_type_t;
 
 cairo_device_type_t
@@ -1188,6 +1188,7 @@ cairo_surface_create_for_rectangle (cairo_surface_t	*target,
                                     double		 width,
                                     double		 height);
 
+/*
 typedef enum {
 	CAIRO_SURFACE_OBSERVER_NORMAL = 0,
 	CAIRO_SURFACE_OBSERVER_RECORD_OPERATIONS = 0x1
@@ -1265,6 +1266,7 @@ cairo_device_observer_stroke_elapsed (cairo_device_t *device);
 
 double
 cairo_device_observer_glyphs_elapsed (cairo_device_t *device);
+*/
 
 cairo_surface_t *
 cairo_surface_reference (cairo_surface_t *surface);
@@ -1464,6 +1466,7 @@ cairo_bool_t
 cairo_recording_surface_get_extents (cairo_surface_t *surface,
 				     cairo_rectangle_t *extents);
 
+/*
 typedef cairo_surface_t *
 (*cairo_raster_source_acquire_func_t) (cairo_pattern_t *pattern,
 				       void *callback_data,
@@ -1529,6 +1532,7 @@ cairo_raster_source_pattern_set_finish (cairo_pattern_t *pattern,
 
 cairo_raster_source_finish_func_t
 cairo_raster_source_pattern_get_finish (cairo_pattern_t *pattern);
+*/
 
 cairo_pattern_t *
 cairo_pattern_create_rgb (double red, double green, double blue);
@@ -1578,8 +1582,8 @@ typedef enum _cairo_pattern_type {
     CAIRO_PATTERN_TYPE_SURFACE,
     CAIRO_PATTERN_TYPE_LINEAR,
     CAIRO_PATTERN_TYPE_RADIAL,
-    CAIRO_PATTERN_TYPE_MESH,
-    CAIRO_PATTERN_TYPE_RASTER_SOURCE
+    // CAIRO_PATTERN_TYPE_MESH,
+    // CAIRO_PATTERN_TYPE_RASTER_SOURCE
 } cairo_pattern_type_t;
 
 cairo_pattern_type_t
@@ -1596,6 +1600,7 @@ cairo_pattern_add_color_stop_rgba (cairo_pattern_t *pattern,
 				   double red, double green, double blue,
 				   double alpha);
 
+/*
 void
 cairo_mesh_pattern_begin_patch (cairo_pattern_t *pattern);
 
@@ -1639,6 +1644,7 @@ cairo_pattern_set_matrix (cairo_pattern_t      *pattern,
 void
 cairo_pattern_get_matrix (cairo_pattern_t *pattern,
 			  cairo_matrix_t  *matrix);
+*/
 
 typedef enum _cairo_extend {
     CAIRO_EXTEND_NONE,
